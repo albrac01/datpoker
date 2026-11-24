@@ -25,7 +25,6 @@ let current: Screen = 'sLoading'
 let showInvite = false
 let lastRevealed: string | null | undefined // undefined: nog niet geladen
 let finishShownFor = 0
-let editingTeam = false
 const nudgeCooldown: Record<string, number> = {}
 
 const app = $('app')
@@ -316,10 +315,6 @@ $('toTable').onclick = () => {
   show('sTable')
   renderTable(true)
 }
-$('invite').onclick = () => {
-  renderInvite()
-  show('sInvite')
-}
 $('toStart').onclick = () => navigate('/')
 
 // ---------- 3. meedoen via de link ----------
@@ -366,48 +361,56 @@ $<HTMLFormElement>('joinForm').onsubmit = async (e) => {
 
 // ---------- 4. de tafel ----------
 function renderTeamName() {
-  if (editingTeam) return
-  const box = $('teamName')
-  const team = room?.meta?.team ?? ''
-  box.innerHTML = ''
-  if (!isHost()) {
-    box.textContent = team
-    return
-  }
-  const b = document.createElement('button')
-  b.className = 'team-edit'
-  b.textContent = team
-  b.setAttribute('aria-label', `Teamnaam: ${team}. Tik om te wijzigen.`)
-  b.onclick = () => {
-    editingTeam = true
-    const inp = document.createElement('input')
-    inp.className = 'team-input'
-    inp.value = team
-    inp.maxLength = 24
-    inp.setAttribute('aria-label', 'Teamnaam')
-    let done = false
-    const save = async (keep: boolean) => {
-      if (done) return
-      done = true
-      editingTeam = false
-      const v = inp.value.trim()
-      if (keep && v && v !== team) await backend.update(`rooms/${code}/meta`, { team: v })
-      renderTeamName()
-    }
-    inp.onkeydown = (ev) => {
-      if (ev.key === 'Enter') void save(true)
-      if (ev.key === 'Escape') {
-        ev.stopPropagation()
-        void save(false)
+  $('teamName').textContent = room?.meta?.team ?? ''
+}
+
+// Teammenu: uitnodigen, teamnaam wijzigen (alleen starter) en de tafel verlaten
+$('teamBtn').onclick = () => {
+  const team = room?.meta?.team ?? 'Team'
+  const host = isHost()
+  openSheet(
+    'team',
+    `<h2>${esc(team)}</h2>
+    ${host ? `<form class="team-form" id="renameForm"><label class="sr-only" for="renameInput">Teamnaam</label><input id="renameInput" maxlength="24" value="${esc(team)}"><button class="btn secondary">Opslaan</button></form>` : ''}
+    <button class="btn secondary wide" id="menuInvite">Teamgenoten uitnodigen</button>
+    <button class="btn secondary wide danger" id="menuLeave">Tafel verlaten</button>
+    <p>${host ? 'Je blijft de starter: via de link kom je later terug en kun je weer afronden.' : 'Via de link kun je later altijd weer meedoen.'}</p>
+    <button class="btn primary wide" id="menuClose">Sluiten</button>`,
+    (o) => {
+      const form = o.querySelector<HTMLFormElement>('#renameForm')
+      if (form)
+        form.onsubmit = async (e) => {
+          e.preventDefault()
+          const v = o.querySelector<HTMLInputElement>('#renameInput')!.value.trim()
+          if (v && v !== team) {
+            await backend.update(`rooms/${code}/meta`, { team: v })
+            toast('Teamnaam gewijzigd')
+          }
+          closeSheet()
+        }
+      o.querySelector<HTMLElement>('#menuInvite')!.onclick = () => {
+        closeSheet()
+        renderInvite()
+        show('sInvite')
       }
-    }
-    inp.onblur = () => void save(true)
-    box.innerHTML = ''
-    box.append(inp)
-    inp.focus()
-    inp.select()
+      o.querySelector<HTMLElement>('#menuLeave')!.onclick = () => void leaveTable()
+      o.querySelector<HTMLElement>('#menuClose')!.onclick = () => closeSheet()
+    },
+  )
+}
+
+async function leaveTable() {
+  const team = room?.meta?.team ?? 'het team'
+  const c = code
+  closeSheet()
+  leaveRoom() // eerst stoppen met volgen, zodat het meedoen-scherm niet even verschijnt
+  try {
+    await backend.update(`rooms/${c}`, { [`players/${backend.uid}`]: null, [`votes/${backend.uid}`]: null })
+  } catch (error) {
+    console.error(error)
   }
-  box.append(b)
+  navigate('/')
+  toast(`Je hebt ${team} verlaten`)
 }
 
 let lastSignature = ''
