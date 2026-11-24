@@ -1,0 +1,152 @@
+/*
+  VOICE   Rustig en zakelijk, met een knipoog op de momenten die ertoe doen.
+  IDEA    Kleuren in de lijn van de Toeslagen-site: violet, warm geel, veel wit.
+  PICTURE De rij kaarten van het team en jouw kaarten eronder.
+  COLOUR  Licht (standaard): wit met violet #42145f. Donker: diep violet met geel als actiekleur.
+  TYPE    Systeemlettertype, vier groottes.
+*/
+:root{color-scheme:light;
+  --bg:#f6f9fc;--panel:#ffffff;--ink:#000000;--muted:#5c5466;--line:#e3dce7;
+  --accent:#42145f;--on-accent:#ffffff;--soft:#e3dce7;--note:#fef4db;--frame:#dfe2e8;--bezel:#1d2129}
+/* Donker is een eigen keuze in de app, los van de instelling van het toestel of de omgeving */
+:root.dark{color-scheme:dark;
+  --bg:#160f1d;--panel:#221a2b;--ink:#f3eef7;--muted:#b3a8bf;--line:#3a2e46;
+  --accent:#ffb612;--on-accent:#1a1200;--soft:#33264a;--note:#3a3016;--frame:#0d0e11;--bezel:#2a2d35}
+:root.t-koningsdag{--accent:#d96400;--on-accent:#fff}
+:root.dark.t-koningsdag{--accent:#ff8a1f;--on-accent:#1a0d00}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+button,select{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+/* De app vult precies één scherm: niets hoeft te scrollen */
+main{position:relative;height:100dvh;display:flex;flex-direction:column;gap:12px;padding:16px 16px max(16px,env(safe-area-inset-bottom));background:var(--bg);overflow:hidden}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.titles{display:grid}
+h1{margin:0;font-size:20px;font-weight:700;display:flex;align-items:center;gap:6px;white-space:nowrap}
+h1.flip{animation:aprilgrap 2.4s ease-in-out 1 .6s}
+@keyframes aprilgrap{25%,75%{transform:rotate(180deg)}}
+.mitre{width:16px;height:20px;flex:none}
+.status{font-size:14px;color:var(--muted)}
+.team-edit{justify-self:start;padding:0;border:0;background:none;color:var(--muted);font-size:14px;text-decoration:underline dotted;text-underline-offset:3px}
+.team-input{width:170px;min-height:28px;padding:2px 6px;border:1px solid var(--accent);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;font-size:14px}
+.tools{display:flex;gap:6px;flex:none}
+.tool{min-height:40px;padding:0 11px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:14px;font-weight:600}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+.team{--cols:4;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 0;list-style:none;margin:0;padding:0}
+.team .seat{width:calc(100% / var(--cols));padding:0 2px}
+.seat{display:grid;justify-items:center;gap:4px;font-size:14px}
+.seat-btn{display:grid;justify-items:center;gap:4px;width:100%;padding:0;border:0;background:none;border-radius:10px}
+.seat-btn:disabled{cursor:default}
+.name{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.seat.me .name{color:var(--ink);font-weight:600}
+.slot{position:relative;width:48px;height:66px;border-radius:8px;display:grid;place-items:center;font-size:22px;font-weight:700;border:2px dashed var(--line);color:var(--muted);transition:background .2s,border-color .2s}
+.slot.voted{border:2px solid var(--accent);background:var(--soft)}
+.slot.voted::after{content:"";width:16px;height:16px;border-radius:50%;background:var(--accent);opacity:.35}
+.slot.open{border:2px solid var(--line);background:var(--panel);color:var(--ink);animation:turn .35s ease-out both}
+.slot.open::after{display:none}
+.slot.agree{border-color:var(--accent)}
+@keyframes turn{from{transform:rotateY(90deg)}}
+.mic{position:absolute;top:-10px;right:-12px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--note);border:2px solid var(--panel);font-size:14px;animation:pop .3s ease-out .35s both}
+@keyframes pop{from{transform:scale(0)}}
+.hat{position:absolute;top:-17px;left:-10px;width:30px;height:24px;transform:rotate(-18deg);pointer-events:none}
+.wiggle{animation:wiggle .55s}
+@keyframes wiggle{20%,60%{transform:translateX(-5px) rotate(-5deg)}40%,80%{transform:translateX(5px) rotate(5deg)}}
+.actions{display:flex;gap:8px;margin-top:12px}
+.btn{flex:1;min-height:48px;padding:0 16px;border-radius:10px;border:1px solid transparent;font-weight:600;font-size:16px}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn.primary:disabled{opacity:.4;cursor:not-allowed}
+.btn.secondary{flex:0 0 auto;background:var(--panel);border-color:var(--line);color:var(--ink);font-size:14px;padding:0 12px}
+.btn.secondary:disabled{color:var(--muted);cursor:not-allowed}
+.middle{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0}
+.result{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;text-align:center}
+.result div{display:grid}
+.result b{font-size:24px;line-height:1.2}
+.result span{color:var(--muted);font-size:13px}
+.result .agree{grid-column:1/-1;margin:4px 0 0;padding:8px;border-radius:8px;background:var(--note);font-size:14px}
+.hint{color:var(--muted);font-size:14px;text-align:center;margin:0}
+.hand h2{margin:0 0 10px;font-size:15px;font-weight:600}
+/* Alle kaarten in één blik: 3 rijen van 3 */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.card{height:clamp(50px,9dvh,80px);border-radius:12px;border:1px solid var(--line);background:var(--panel);font-size:26px;font-weight:700;transition:transform .12s,border-color .12s}
+.card:hover:not(:disabled){border-color:var(--accent)}
+.card[aria-checked=true]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.card:disabled{opacity:.45;cursor:not-allowed}
+.card[aria-checked=true]:disabled{opacity:1}
+.note{color:var(--muted);font-size:12px;text-align:center;margin:0}
+.toast{position:absolute;left:16px;right:16px;top:12px;z-index:5;padding:10px 14px;border-radius:10px;background:var(--ink);color:var(--bg);font-size:15px;font-weight:600;text-align:center;animation:drop .25s ease-out}
+@keyframes drop{from{transform:translateY(-10px);opacity:0}}
+/* Feestje: deeltjes vallen of spatten binnen het scherm van de app */
+.party{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden}
+.bit{position:absolute;top:-20px;animation:fall var(--dur) cubic-bezier(.3,.6,.5,1) var(--delay) forwards}
+@keyframes fall{to{transform:translate(var(--dx),110dvh) rotate(var(--rot))}}
+.bit.burst{top:var(--y);left:var(--x);animation:burst 1.3s ease-out var(--delay) forwards;opacity:0}
+@keyframes burst{0%{opacity:1;transform:translate(0,0) scale(.6)}80%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1)}}
+/* Vensters: menu, prijsuitreiking */
+.overlay{position:absolute;inset:0;z-index:6;display:flex;align-items:flex-end;background:rgba(10,6,20,.45);animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{width:100%;max-height:100%;overflow:auto;background:var(--panel);color:var(--ink);border-radius:18px 18px 0 0;padding:18px 16px max(18px,env(safe-area-inset-bottom));display:grid;gap:12px;animation:up .25s ease-out}
+@keyframes up{from{transform:translateY(30px)}}
+.sheet h2{margin:0;font-size:20px}
+.sheet p{margin:0;color:var(--muted);font-size:14px}
+.awards{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.awards li{display:grid;grid-template-columns:36px minmax(0,1fr);gap:2px 10px;align-items:center;padding:10px 12px;border-radius:10px;background:var(--bg)}
+.awards .icon{grid-row:1/3;font-size:26px;text-align:center}
+.awards b{font-size:16px}
+.awards span{color:var(--muted);font-size:14px}
+.options{display:grid;gap:6px}
+.option{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:46px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);text-align:left}
+.option[aria-checked=true]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.option small{color:var(--muted);font-size:13px}
+.row{display:flex;gap:8px}
+/* Op een groot scherm tonen we de app zoals op een telefoon */
+/* Schermen */
+.screen{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
+.screen[hidden]{display:none}
+#sStart,#sJoin,#sInvite{justify-content:center}
+.screen > .btn{flex:none}
+.intro{display:grid;gap:6px;text-align:center;padding:0 8px}
+.intro h2{margin:0;font-size:22px;line-height:1.2}
+.intro p{margin:0;color:var(--muted);font-size:15px}
+.intro .muted{font-size:14px}
+.form{display:grid;gap:6px}
+.form label{font-size:14px;font-weight:600}
+.form input{min-height:48px;padding:0 12px;margin-bottom:8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:16px}
+.form input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--soft)}
+.form .btn{margin-top:4px}
+.error{margin:0 0 6px;color:#b00020;font-size:14px}
+:root.dark .error{color:#ff8a95}
+.invite{display:grid;gap:10px;justify-items:center;text-align:center}
+.invite h2{margin:0;font-size:20px}
+.invite p{margin:0;color:var(--muted);font-size:14px}
+.qr{width:min(180px,26dvh);aspect-ratio:1;padding:8px;border-radius:10px;background:#fff;border:1px solid var(--line)}
+.qr svg{display:block;width:100%;height:100%}
+.link{font-weight:600;color:var(--ink)!important;font-size:14px;word-break:break-all;padding:8px 10px;border-radius:8px;background:var(--bg);width:100%}
+.row .grow{flex:1}
+.invite .row{width:100%}
+.linkbtn{align-self:center;padding:6px;border:0;background:none;color:var(--accent);font-weight:600;font-size:15px;text-decoration:underline;text-underline-offset:3px}
+:root.dark .linkbtn{color:var(--accent)}
+.linkbtn.small{font-size:12px;padding:0 4px}
+.team-line[hidden]{display:none}
+.team-line{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.team-line .linkbtn.small{font-size:14px;padding:0}
+/* 5-6 spelers: één rij met iets smallere kaartjes. Meer dan 6: een tweede rij, met wat compactere kaartjes en speelkaarten zodat alles op één scherm blijft */
+main.row6 .slot{width:42px;height:58px;font-size:20px}
+main.row6 .seat{font-size:12px}
+main.rows2 .team{row-gap:6px}
+main.rows2 .slot{width:40px;height:54px;font-size:19px}
+main.rows2 .card{height:clamp(44px,7.4dvh,72px)}
+main.rows2 .seat{gap:2px;font-size:12px}
+main.rows2 .actions{margin-top:10px}
+main.cols6 .slot{width:36px;height:50px;font-size:17px}
+.players{display:inline-flex;align-items:center;gap:6px;margin-left:4px}
+.players button{width:28px;height:28px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-weight:700;line-height:1}
+@media(min-width:560px) and (min-height:600px){
+  body{display:grid;place-items:center;background:var(--frame)}
+  main{width:390px;height:min(844px,calc(100dvh - 32px));border-radius:36px;border:10px solid var(--bezel);box-shadow:0 30px 60px -30px rgba(0,0,0,.5);padding-top:16px}
+  .party,.overlay{border-radius:26px}
+}
+/* Kleine telefoons: iets compacter zodat alles op één scherm blijft */
+@media(max-height:660px){.card{height:48px}main.rows2 .card{height:42px}main.rows2 .slot{width:36px;height:48px}}
+@media(max-height:700px){main{gap:8px}.screen{gap:8px}.intro h2{font-size:19px}.qr{width:min(150px,24dvh)}.panel{padding:12px}.slot{width:42px;height:58px;font-size:20px}.actions{margin-top:10px}.btn{min-height:44px}.result b{font-size:20px}.result .agree{padding:6px;font-size:13px}.hand h2{margin-bottom:8px}.cards{gap:8px}.note{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.party{display:none}}
