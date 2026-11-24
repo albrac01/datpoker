@@ -651,6 +651,11 @@ function handleFinish() {
 }
 
 // ---------- start ----------
+// Voorbeeldnamen in de invulvelden: elke keer een andere
+const EXAMPLE_NAMES = ['Sanne', 'Daan', 'Fatima', 'Jeroen', 'Noor', 'Mohammed', 'Lotte', 'Bram', 'Annemarie', 'Kees', 'Priya', 'Sem', 'Esther', 'Youssef', 'Willemijn', 'Ruben', 'Ilse', 'Thijs', 'Aylin', 'Gerard']
+const shuffled = [...EXAMPLE_NAMES].sort(() => Math.random() - 0.5)
+$<HTMLInputElement>('hostName').placeholder = `Bijvoorbeeld ${shuffled[0]}`
+$<HTMLInputElement>('joinName').placeholder = `Bijvoorbeeld ${shuffled[1]}`
 const hr = new Date().getHours()
 $('greeting').textContent = (hr < 6 ? 'Goedenacht' : hr < 12 ? 'Goedemorgen' : hr < 18 ? 'Goedemiddag' : 'Goedenavond') + ', welkom!'
 applyDark()
