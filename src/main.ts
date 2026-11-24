@@ -654,6 +654,8 @@ function handleFinish() {
 }
 
 // ---------- start ----------
+// Op de live site (niet lokaal) toont Netlify rechtsonder een badge: daar houden we ruimte vrij
+if (!/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) document.documentElement.classList.add('badge-space')
 // Voorbeeldnamen in de invulvelden: elke keer een andere
 const EXAMPLE_NAMES = ['Sanne', 'Daan', 'Fatima', 'Jeroen', 'Noor', 'Mohammed', 'Lotte', 'Bram', 'Annemarie', 'Kees', 'Priya', 'Sem', 'Esther', 'Youssef', 'Willemijn', 'Ruben', 'Ilse', 'Thijs', 'Aylin', 'Gerard']
 const shuffled = [...EXAMPLE_NAMES].sort(() => Math.random() - 0.5)

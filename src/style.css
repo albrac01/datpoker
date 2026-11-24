@@ -92,8 +92,7 @@ h1.flip{animation:aprilgrap 2.4s ease-in-out 1 .6s}
 /* Vensters: menu, prijsuitreiking */
 .overlay{position:absolute;inset:0;z-index:6;display:flex;align-items:flex-end;background:rgba(10,6,20,.45);animation:fade .2s}
 @keyframes fade{from{opacity:0}}
-/* Onderaan extra ruimte, zodat de Netlify-badge rechtsonder niet over de knoppen valt */
-.sheet{width:100%;max-height:100%;overflow:auto;background:var(--panel);color:var(--ink);border-radius:18px 18px 0 0;padding:18px 16px calc(64px + env(safe-area-inset-bottom));display:grid;gap:12px;animation:up .25s ease-out}
+.sheet{width:100%;max-height:100%;overflow:auto;background:var(--panel);color:var(--ink);border-radius:18px 18px 0 0;padding:18px 16px max(18px,env(safe-area-inset-bottom));display:grid;gap:12px;animation:up .25s ease-out}
 @keyframes up{from{transform:translateY(30px)}}
 .sheet h2{margin:0;font-size:20px}
 .sheet p{margin:0;color:var(--muted);font-size:14px}
@@ -149,10 +148,18 @@ main.rows2 .actions{margin-top:10px}
 main.cols6 .slot{width:36px;height:50px;font-size:17px}
 .players{display:inline-flex;align-items:center;gap:6px;margin-left:4px}
 .players button{width:28px;height:28px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-weight:700;line-height:1}
+/* Netlify-badge rechtsonder: op de live site houden we onderaan een strook vrij,
+   zodat de badge nooit over kaarten of knoppen valt. Vensters zweven boven die strook. */
+:root.badge-space main{padding-bottom:calc(52px + env(safe-area-inset-bottom))}
+:root.badge-space .overlay{padding-bottom:calc(52px + env(safe-area-inset-bottom))}
+:root.badge-space .sheet{border-radius:18px}
 @media(min-width:560px) and (min-height:600px){
   body{display:grid;place-items:center;background:var(--frame)}
   main{width:390px;height:min(844px,calc(100dvh - 32px));border-radius:36px;border:10px solid var(--bezel);box-shadow:0 30px 60px -30px rgba(0,0,0,.5);padding-top:16px}
   .party,.overlay{border-radius:26px}
+  :root.badge-space main{padding-bottom:16px}
+  :root.badge-space .overlay{padding-bottom:0}
+  :root.badge-space .sheet{border-radius:18px 18px 0 0}
 }
 /* Kleine telefoons: iets compacter zodat alles op één scherm blijft */
 @media(max-height:660px){.card{height:48px}main.rows2 .card{height:42px}main.rows2 .slot{width:36px;height:48px}}
