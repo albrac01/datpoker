@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>DAT pokert wat</title>
+  <meta name="description" content="Planning poker voor je team: kaart kiezen, omdraaien, volgende story.">
+  <meta name="theme-color" content="#f6f9fc">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="DAT pokert wat">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+</head>
+<body>
+<main id="app">
+  <header>
+    <div class="titles">
+      <h1 id="title"><span>DAT pokert wat</span></h1>
+      <span class="status team-line" id="teamLine" hidden><span id="teamName"></span> <button class="linkbtn small" id="invite">Uitnodigen</button></span>
+    </div>
+    <div class="tools">
+      <button class="tool" id="themeBtn" aria-haspopup="dialog">Thema</button>
+      <button class="tool" id="dark">Donker</button>
+    </div>
+  </header>
+
+  <!-- Laden -->
+  <section class="screen" id="sLoading" aria-busy="true">
+    <p class="hint" id="loadingText">Even laden…</p>
+  </section>
+
+  <!-- Team niet gevonden of niet bereikbaar -->
+  <section class="screen" id="sMissing" hidden>
+    <div class="intro">
+      <h2 id="missingTitle">Dit team bestaat niet</h2>
+      <p id="missingText">Controleer de link, of maak zelf een team aan.</p>
+    </div>
+    <button class="btn primary" id="toStart">Zelf een team aanmaken</button>
+  </section>
+
+  <!-- 1. Team aanmaken -->
+  <section class="screen" id="sStart" aria-label="Team aanmaken" hidden>
+    <div class="intro">
+      <h2 id="greeting">Welkom!</h2>
+      <p>Fijn dat je er bent. Maak een team aan, deel de link, en jullie kunnen meteen beginnen.</p>
+    </div>
+    <form class="panel form" id="startForm" novalidate>
+      <label for="hostName">Jouw naam</label>
+      <input id="hostName" autocomplete="given-name" maxlength="40" placeholder="Bijvoorbeeld Monique">
+      <label for="newTeam">Teamnaam</label>
+      <input id="newTeam" maxlength="24" placeholder="Bijvoorbeeld Team DAT">
+      <p class="error" id="startError" hidden></p>
+      <button class="btn primary" id="createBtn">Team aanmaken</button>
+    </form>
+    <p class="hint">Heb je een link gekregen? Open die, dan kom je direct bij je team.</p>
+  </section>
+
+  <!-- 2. Link delen -->
+  <section class="screen" id="sInvite" aria-label="Team uitnodigen" hidden>
+    <div class="panel invite">
+      <h2 id="inviteTitle">Team staat klaar</h2>
+      <p>Deel deze link met je team. Een account is niet nodig.</p>
+      <div class="qr" id="qr" aria-hidden="true"></div>
+      <p class="link" id="link"></p>
+      <div class="row">
+        <button class="btn secondary grow" id="copy">Link kopiëren</button>
+        <button class="btn secondary grow" id="share">Delen…</button>
+      </div>
+    </div>
+    <button class="btn primary" id="toTable">Naar de tafel</button>
+  </section>
+
+  <!-- 3. Meedoen via een link -->
+  <section class="screen" id="sJoin" aria-label="Meedoen" hidden>
+    <div class="intro">
+      <p class="muted" id="joinBy">Je bent uitgenodigd voor</p>
+      <h2 id="joinTeam">Team</h2>
+      <p id="joinHere"></p>
+    </div>
+    <form class="panel form" id="joinForm" novalidate>
+      <label for="joinName">Jouw naam</label>
+      <input id="joinName" autocomplete="given-name" maxlength="40" placeholder="Bijvoorbeeld Fatima">
+      <p class="error" id="joinError" hidden></p>
+      <button class="btn primary" id="joinBtn">Meedoen</button>
+    </form>
+    <p class="hint">Je naam wordt op dit toestel onthouden.</p>
+  </section>
+
+  <!-- 4. De tafel -->
+  <section class="screen" id="sTable" aria-label="Tafel" hidden>
+    <section class="panel" aria-label="Team">
+      <ul class="team" id="team"></ul>
+      <div class="actions">
+        <button class="btn primary" id="reveal">Kaarten omdraaien</button>
+        <button class="btn primary" id="reset" hidden>Volgende story</button>
+        <button class="btn secondary" id="finish" hidden>Afronden</button>
+      </div>
+    </section>
+
+    <div class="middle">
+      <section class="panel" id="result" hidden aria-live="polite"></section>
+      <p class="hint" id="hint" aria-live="polite"></p>
+    </div>
+
+    <section class="panel hand" id="hand">
+      <h2 id="handTitle">Kies je kaart</h2>
+      <div class="cards" id="cards" role="radiogroup" aria-labelledby="handTitle"></div>
+    </section>
+  </section>
+
+  <p class="note" id="demoNote" hidden>Demomodus: open dezelfde link in een tweede tabblad om als teamgenoot mee te doen.</p>
+</main>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
