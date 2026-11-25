@@ -98,7 +98,10 @@ const activeTheme = () => (themeMode === 'uit' ? null : themeMode === 'auto' ? t
 function applyTheme() {
   const t = activeTheme()
   for (const id of Object.keys(THEMES)) document.documentElement.classList.toggle('t-' + id, t === id)
-  $('title').innerHTML = '<span>DAT pokert wat</span>' + (t === 'sinterklaas' ? MITRE : '')
+  // Logo blijft staan; alleen het mijtertje komt erbij of gaat weg
+  const title = $('title')
+  title.querySelector('.mitre')?.remove()
+  if (t === 'sinterklaas') title.insertAdjacentHTML('beforeend', MITRE)
   $('title').classList.toggle('flip', t === 'aprilgrap')
   $('themeBtn').setAttribute('aria-label', t ? `Feestthema's, nu ${THEMES[t].name}` : "Feestthema's")
 }

@@ -27,6 +27,14 @@ h1{margin:0;font-size:20px;font-weight:700;display:flex;align-items:center;gap:6
 h1.flip{animation:aprilgrap 2.4s ease-in-out 1 .6s}
 @keyframes aprilgrap{25%,75%{transform:rotate(180deg)}}
 .mitre{width:16px;height:20px;flex:none}
+/* Logo: liggend in de kop, staand op het beginscherm; per weergave de juiste kleurversie */
+.logo{display:block;line-height:0}
+.logo img{height:32px;width:auto;display:block}
+.logo-big{display:block;line-height:0;justify-self:center;margin-bottom:6px}
+.logo-big img{width:min(200px,52vw);height:auto;display:block}
+.logo-dark{display:none!important}
+:root.dark .logo-light{display:none!important}
+:root.dark .logo-dark{display:block!important}
 .status{font-size:14px;color:var(--muted)}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .team-btn{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-height:28px;padding:0;border:0;background:none;color:var(--muted);font-size:14px}
@@ -163,5 +171,5 @@ main.cols6 .slot{width:36px;height:50px;font-size:17px}
 }
 /* Kleine telefoons: iets compacter zodat alles op één scherm blijft */
 @media(max-height:660px){.card{height:48px}main.rows2 .card{height:42px}main.rows2 .slot{width:36px;height:48px}}
-@media(max-height:700px){main{gap:8px}.screen{gap:8px}.intro h2{font-size:19px}.qr{width:min(150px,24dvh)}.panel{padding:12px}.slot{width:42px;height:58px;font-size:20px}.actions{margin-top:10px}.btn{min-height:44px}.result b{font-size:20px}.result .agree{padding:6px;font-size:13px}.hand h2{margin-bottom:8px}.cards{gap:8px}.note{display:none}}
+@media(max-height:700px){.logo-big img{width:min(140px,40vw)}main{gap:8px}.screen{gap:8px}.intro h2{font-size:19px}.qr{width:min(150px,24dvh)}.panel{padding:12px}.slot{width:42px;height:58px;font-size:20px}.actions{margin-top:10px}.btn{min-height:44px}.result b{font-size:20px}.result .agree{padding:6px;font-size:13px}.hand h2{margin-bottom:8px}.cards{gap:8px}.note{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.party{display:none}}

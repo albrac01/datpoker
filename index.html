@@ -9,15 +9,16 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="DAT pokert wat">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
 </head>
 <body>
 <main id="app">
   <header>
     <div class="titles">
-      <h1 id="title"><span>DAT pokert wat</span></h1>
+      <h1 id="title"><span class="logo"><img class="logo-light" src="/logo-horizontal-light.svg" alt="DAT pokert wat" width="263" height="64"><img class="logo-dark" src="/logo-horizontal-dark.svg" alt="DAT pokert wat" width="263" height="64"></span></h1>
       <span class="status team-line" id="teamLine" hidden><button class="team-btn" id="teamBtn" aria-haspopup="dialog"><span id="teamName"></span><span aria-hidden="true">▾</span></button></span>
     </div>
     <div class="tools">
@@ -43,6 +44,7 @@
   <!-- 1. Team aanmaken -->
   <section class="screen" id="sStart" aria-label="Team aanmaken" hidden>
     <div class="intro">
+      <span class="logo-big" aria-hidden="true"><img class="logo-light" src="/logo-stacked-light.svg" alt="" width="360" height="244"><img class="logo-dark" src="/logo-stacked-dark.svg" alt="" width="360" height="244"></span>
       <h2 id="greeting">Welkom!</h2>
       <p>Fijn dat je er bent. Maak een team aan, deel de link, en jullie kunnen meteen beginnen.</p>
     </div>
