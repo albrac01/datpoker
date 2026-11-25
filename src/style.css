@@ -26,7 +26,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:8px}
 h1{margin:0;font-size:20px;font-weight:700;display:flex;align-items:center;gap:6px;white-space:nowrap}
 h1.flip{animation:aprilgrap 2.4s ease-in-out 1 .6s}
 @keyframes aprilgrap{25%,75%{transform:rotate(180deg)}}
-.mitre{width:16px;height:20px;flex:none}
+.mitre{width:22px;height:27px;flex:none;margin-top:-4px}
 /* Logo: liggend in de kop, staand op het beginscherm; per weergave de juiste kleurversie */
 .logo{display:block;line-height:0}
 .logo img{height:32px;width:auto;display:block}
@@ -64,7 +64,7 @@ h1.flip{animation:aprilgrap 2.4s ease-in-out 1 .6s}
 @keyframes turn{from{transform:rotateY(90deg)}}
 .mic{position:absolute;top:-10px;right:-12px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--note);border:2px solid var(--panel);font-size:14px;animation:pop .3s ease-out .35s both}
 @keyframes pop{from{transform:scale(0)}}
-.hat{position:absolute;top:-17px;left:-10px;width:30px;height:24px;transform:rotate(-18deg);pointer-events:none}
+.hat{position:absolute;top:-17px;left:-10px;width:30px;height:25px;transform:rotate(-18deg);pointer-events:none}
 .wiggle{animation:wiggle .55s}
 @keyframes wiggle{20%,60%{transform:translateX(-5px) rotate(-5deg)}40%,80%{transform:translateX(5px) rotate(5deg)}}
 .actions{display:flex;gap:8px;margin-top:12px}
@@ -118,7 +118,7 @@ h1.flip{animation:aprilgrap 2.4s ease-in-out 1 .6s}
 /* Schermen */
 .screen{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
 .screen[hidden]{display:none}
-#sStart,#sJoin,#sInvite{justify-content:center}
+#sStart,#sJoin,#sInvite{justify-content:safe center;overflow-y:auto}
 .screen > .btn{flex:none}
 .intro{display:grid;gap:6px;text-align:center;padding:0 8px}
 .intro h2{margin:0;font-size:22px;line-height:1.2}
