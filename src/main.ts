@@ -9,7 +9,7 @@ import { $, esc, fmt, roomCode, shortId, store } from './lib/util'
 interface Player { name: string; joinedAt: number; online?: boolean; lastSeen?: number }
 interface Vote { value: string; round: string; at: number }
 interface Round { id: string; n: number; revealed: boolean; startedAt: number; revealedAt?: number; mics?: string[] }
-interface Meta { team: string; createdBy: string; hostName: string; createdAt: number; finished?: number | null }
+interface Meta { team: string; createdBy: string; hostName: string; createdAt: number; finished?: number | null; autoReveal?: boolean }
 interface Room { meta?: Meta; players?: Record<string, Player>; round?: Round; votes?: Record<string, Vote>; history?: Record<string, HistoryRound> }
 interface Nudge { from: string; fromName: string; at: number }
 
@@ -243,6 +243,7 @@ function onRoom() {
   renderTable()
   handleReveal()
   handleFinish()
+  maybeAutoReveal()
 }
 
 // ---------- 1. team aanmaken ----------
@@ -262,7 +263,7 @@ $<HTMLFormElement>('startForm').onsubmit = async (e) => {
     for (let i = 0; i < 5 && (await backend.get(`rooms/${c}/meta/team`)) !== null; i++) c = roomCode()
     const now = backend.now()
     await backend.set(`rooms/${c}`, {
-      meta: { team, createdBy: backend.uid, hostName: name, createdAt: now },
+      meta: { team, createdBy: backend.uid, hostName: name, createdAt: now, autoReveal: $<HTMLInputElement>('autoReveal').checked },
       round: { id: shortId(), n: 1, revealed: false, startedAt: now },
       players: { [backend.uid]: { name, joinedAt: now, online: true, lastSeen: now } },
     })
@@ -375,6 +376,11 @@ $('teamBtn').onclick = () => {
     'team',
     `<h2>${esc(team)}</h2>
     ${host ? `<form class="team-form" id="renameForm"><label class="sr-only" for="renameInput">Teamnaam</label><input id="renameInput" maxlength="24" value="${esc(team)}"><button class="btn secondary">Opslaan</button></form>` : ''}
+    ${
+      host
+        ? `<label class="switch-row" for="menuAuto"><span><b>Kaarten automatisch omdraaien</b><small>Zodra iedereen gestemd heeft</small></span><input type="checkbox" role="switch" id="menuAuto" ${autoRevealOn() ? 'checked' : ''}></label>`
+        : `<p>${autoRevealOn() ? 'De kaarten gaan vanzelf om zodra iedereen gestemd heeft.' : 'De kaarten gaan om als iemand op Kaarten omdraaien tikt.'}</p>`
+    }
     <button class="btn secondary wide" id="menuInvite">Teamgenoten uitnodigen</button>
     <button class="btn secondary wide danger" id="menuLeave">Tafel verlaten</button>
     <p>${host ? 'Je blijft de starter: via de link kom je later terug en kun je weer afronden.' : 'Via de link kun je later altijd weer meedoen.'}</p>
@@ -390,6 +396,12 @@ $('teamBtn').onclick = () => {
             toast('Teamnaam gewijzigd')
           }
           closeSheet()
+        }
+      const auto = o.querySelector<HTMLInputElement>('#menuAuto')
+      if (auto)
+        auto.onchange = async () => {
+          await backend.update(`rooms/${code}/meta`, { autoReveal: auto.checked })
+          toast(auto.checked ? 'Kaarten gaan nu automatisch om' : 'Kaarten draaien jullie nu zelf om')
         }
       o.querySelector<HTMLElement>('#menuInvite')!.onclick = () => {
         closeSheet()
@@ -495,9 +507,11 @@ function renderTable(force = false) {
     n === 1
       ? 'Je zit nog alleen aan tafel. Tik op Uitnodigen om je team erbij te halen.'
       : voted === n
-        ? 'Iedereen heeft gestemd. Draai de kaarten om.'
+        ? autoRevealOn()
+          ? 'Iedereen heeft gestemd. De kaarten gaan om…'
+          : 'Iedereen heeft gestemd. Draai de kaarten om.'
         : myVote
-          ? `${voted} van ${n} gestemd. Wachten op de rest…`
+          ? `${voted} van ${n} gestemd. ${autoRevealOn() ? 'De kaarten gaan vanzelf om als iedereen klaar is.' : 'Wachten op de rest…'}`
           : 'Kies hieronder je kaart. Je teamgenoten zien alleen dát je gestemd hebt.'
 
   const res = $('result')
@@ -541,7 +555,9 @@ function castVote(value: string | null) {
   void (value === null ? backend.remove(path) : backend.set(path, { value, round: r.id, at: backend.now() } satisfies Vote))
 }
 
-$('reveal').onclick = async () => {
+$('reveal').onclick = () => void revealCards()
+
+async function revealCards() {
   const r = room?.round
   if (!r || r.revealed) return
   const v = votes()
@@ -559,7 +575,40 @@ $('reveal').onclick = async () => {
     'round/mics': mics,
     [`history/${r.id}`]: hist,
   })
-  $('reset').focus()
+  if (current === 'sTable') $('reset').focus()
+}
+
+// ---------- automatisch omdraaien ----------
+// Staat standaard aan (ook bij teams van vóór deze instelling). Eén toestel draait om:
+// de starter als die aan tafel zit, anders wie het langst aan tafel zit. Zo gebeurt het maar één keer.
+const autoRevealOn = () => room?.meta?.autoReveal !== false
+let autoTimer = 0
+let autoFor: string | null = null
+function maybeAutoReveal() {
+  const r = room?.round
+  const people = seated()
+  const v = votes()
+  const ready = Boolean(r && !r.revealed && autoRevealOn() && !room?.meta?.finished && people.length >= 2 && people.every(([id]) => v[id] !== undefined))
+  if (!ready) {
+    clearTimeout(autoTimer)
+    autoFor = null
+    return
+  }
+  if (autoFor === r!.id) return // staat al gepland voor deze ronde
+  autoFor = r!.id
+  const order = [...people].sort((a, b) => (a[1].joinedAt ?? 0) - (b[1].joinedAt ?? 0)).map(([id]) => id)
+  const host = room?.meta?.createdBy
+  const leader = host && order.includes(host) ? host : order[0]
+  if (leader !== backend.uid) {
+    autoFor = null
+    return
+  }
+  // Even wachten, zodat de laatste stemmer zijn kaart nog ziet oplichten
+  autoTimer = window.setTimeout(() => {
+    autoFor = null
+    const now = votes()
+    if (!room?.round?.revealed && seated().every(([id]) => now[id] !== undefined)) void revealCards()
+  }, 900)
 }
 
 function newRound(n: number) {

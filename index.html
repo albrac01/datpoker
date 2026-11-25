@@ -53,6 +53,10 @@
       <input id="hostName" autocomplete="given-name" maxlength="40" placeholder="Bijvoorbeeld Sanne">
       <label for="newTeam">Teamnaam</label>
       <input id="newTeam" maxlength="24" placeholder="Bijvoorbeeld Team Aurora">
+      <label class="switch-row" for="autoReveal">
+        <span><b>Kaarten automatisch omdraaien</b><small>Zodra iedereen gestemd heeft</small></span>
+        <input type="checkbox" role="switch" id="autoReveal" checked>
+      </label>
       <p class="error" id="startError" hidden></p>
       <button class="btn primary" id="createBtn">Team aanmaken</button>
     </form>
