@@ -129,6 +129,13 @@ h1.flip{animation:aprilgrap 2.4s ease-in-out 1 .6s}
 .form input:not([type=checkbox]){min-height:48px;padding:0 12px;margin-bottom:8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:16px}
 .form input:not([type=checkbox]):focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--soft)}
 .form .btn{margin-top:4px}
+/* Easter egg: husselende kaarten na zeven tikken op het logo */
+.shuffle{position:absolute;inset:0;z-index:8;display:grid;place-items:center;pointer-events:none;background:rgba(246,249,252,.6);backdrop-filter:blur(2px)}
+:root.dark .shuffle{background:rgba(22,15,29,.6)}
+.shuffle-card{grid-area:1/1;display:grid;place-items:center;width:68px;height:94px;border-radius:12px;font:800 48px/1 system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 10px 24px -8px rgba(0,0,0,.45);opacity:0}
+.shuffle-card.c0{background:#42145f;color:#fff}
+.shuffle-card.c1{background:#e3dce7;color:#42145f}
+.shuffle-card.c2{background:#ffb612;color:#42145f}
 /* Schakelaar (bijvoorbeeld automatisch omdraaien) */
 .switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;margin:2px 0 6px;cursor:pointer}
 .switch-row span{display:grid;gap:1px}

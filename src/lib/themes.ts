@@ -22,6 +22,10 @@ export const THEMES: Record<string, Theme> = {
   halloween: { name: 'Halloween', when: '25 t/m 31 okt', kind: 'fall', shape: 'char', chars: ['🦇'], colors: ['#000'] },
 }
 
+// Easter eggs: goud bij een hattrick, koffie als niemand het weet
+export const GOLD_PARTY: Theme = { name: 'Hattrick', when: '', kind: 'fall', shape: 'rect', colors: ['#ffd54a', '#f2c14e', '#ffb612', '#fff0b8', '#d9a520'] }
+export const COFFEE_PARTY: Theme = { name: 'Koffie', when: '', kind: 'fall', shape: 'char', chars: ['☕'], colors: ['#000'] }
+
 const DEFAULT_PARTY: Theme = { name: 'Standaard', when: '', kind: 'fall', shape: 'rect', colors: ['#42145f', '#ffb612', '#e3dce7', '#f9e11e', '#8fcae7'] }
 
 /** Paaszondag volgens het gregoriaanse rekenschema. */
@@ -76,9 +80,9 @@ function heartSvg(color: string, size: number) {
 }
 
 /** Een feestje binnen het app-scherm: vallende of spattende deeltjes in de stijl van het thema. */
-export function party(host: HTMLElement, themeId: string | null) {
+export function party(host: HTMLElement, theme: string | Theme | null) {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  const t = (themeId && THEMES[themeId]) || DEFAULT_PARTY
+  const t = typeof theme === 'object' && theme ? theme : (theme && THEMES[theme]) || DEFAULT_PARTY
   const box = document.createElement('div')
   box.className = 'party'
   box.setAttribute('aria-hidden', 'true')

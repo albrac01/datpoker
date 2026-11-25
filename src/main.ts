@@ -2,7 +2,7 @@ import './style.css'
 import qrcode from 'qrcode-generator'
 import { getBackend, type Backend, type Unsub } from './lib/sync'
 import { DECK, MAX_PLAYERS, awards, micsFor, summarize, type HistoryRound } from './lib/game'
-import { HAT, MITRE, THEMES, party, themeForDate } from './lib/themes'
+import { COFFEE_PARTY, GOLD_PARTY, HAT, MITRE, THEMES, party, themeForDate } from './lib/themes'
 import { $, esc, fmt, roomCode, shortId, store } from './lib/util'
 
 // ---------- datamodel ----------
@@ -520,7 +520,10 @@ function renderTable(force = false) {
     res.innerHTML = ''
     const grid = document.createElement('div')
     grid.className = 'result'
-    if (!summary) grid.innerHTML = '<p class="agree">Er is geen schatting met een getal.</p>'
+    if (!summary)
+      grid.innerHTML = everyoneUnsure(v)
+        ? '<p class="agree">☕ Niemand weet het. Tijd voor koffie?</p>'
+        : '<p class="agree">Er is geen schatting met een getal.</p>'
     else {
       for (const [k, val] of [['Gemiddelde', fmt(summary.avg)], ['Mediaan', fmt(summary.median)], [summary.consensus ? 'Consensus' : 'Voorstel', summary.near]]) {
         const d = document.createElement('div')
@@ -532,8 +535,13 @@ function renderTable(force = false) {
       const nameOf = (id: string) => (id === backend.uid ? 'Jij' : room?.players?.[id]?.name ?? 'Iemand')
       const who = mics.filter((id) => v[id] !== undefined).map((id) => `${nameOf(id)} (${v[id]})`)
       const numeric = Object.values(v).filter((x) => x !== '?').length
+      const streak = summary.consensus ? consensusStreak() : 0
       p.textContent = summary.consensus
-        ? 'Iedereen is het eens.'
+        ? streak === 3
+          ? '🏆 Hattrick! Drie keer op rij consensus.'
+          : streak > 3
+            ? `🏆 Alweer! ${streak} keer op rij consensus.`
+            : 'Iedereen is het eens.'
         : numeric === 1
           ? 'Er is maar één stem met een getal.'
           : who.length === 2
@@ -617,6 +625,20 @@ function newRound(n: number) {
 $('reset').onclick = () => void newRound((room?.round?.n ?? 0) + 1)
 
 // Consensusfeestje: op elk toestel zodra de kaarten omgaan
+// ---------- easter eggs ----------
+/** Hoeveel rondes op rij eindigden in consensus (de laatste ronde telt mee). */
+function consensusStreak() {
+  const hist = Object.values(room?.history ?? {}).filter(Boolean).sort((a, b) => a.at - b.at)
+  let n = 0
+  for (let i = hist.length - 1; i >= 0 && hist[i].consensus; i--) n++
+  return n
+}
+/** Iedereen aan tafel (minstens twee) koos het vraagteken. */
+function everyoneUnsure(v: Record<string, string>) {
+  const vals = Object.values(v)
+  return vals.length >= 2 && vals.length === seated().length && vals.every((x) => x === '?')
+}
+
 function handleReveal() {
   const r = room?.round
   const id = r?.revealed ? r.id : null
@@ -626,10 +648,16 @@ function handleReveal() {
   }
   if (id && id !== lastRevealed) {
     lastRevealed = id
-    if (summarize(votes())?.consensus) {
-      party(app, activeTheme())
-      navigator.vibrate?.([40, 30, 40])
-    }
+    const v = votes()
+    if (summarize(v)?.consensus) {
+      if (consensusStreak() === 3) {
+        party(app, GOLD_PARTY) // hattrick
+        navigator.vibrate?.([60, 40, 60, 40, 120])
+      } else {
+        party(app, activeTheme())
+        navigator.vibrate?.([40, 30, 40])
+      }
+    } else if (everyoneUnsure(v)) party(app, COFFEE_PARTY)
   } else if (!id) lastRevealed = null
 }
 
@@ -703,6 +731,53 @@ function handleFinish() {
     },
   )
   if (withAwards) party(app, activeTheme())
+}
+
+// Zeven keer op het logo tikken: de kaarten D, A en T husselen even tot TAD
+let logoTaps: number[] = []
+let shuffling = false
+$('title').addEventListener('click', () => {
+  const now = Date.now()
+  logoTaps = [...logoTaps.filter((t) => now - t < 3000), now]
+  if (logoTaps.length >= 7 && !shuffling) {
+    logoTaps = []
+    void shuffleCards()
+  }
+})
+async function shuffleCards() {
+  shuffling = true
+  const stage = document.createElement('div')
+  stage.className = 'shuffle'
+  stage.setAttribute('aria-hidden', 'true')
+  const cards = ['D', 'A', 'T'].map((l, i) => {
+    const c = document.createElement('span')
+    c.className = `shuffle-card c${i}`
+    c.textContent = l
+    stage.append(c)
+    return c
+  })
+  app.append(stage)
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const pos = (slot: number, lift = 0, rot = 0) => `translate(${(slot - 1) * 78}px, ${-lift}px) rotate(${rot}deg)`
+  const move = (el: HTMLElement, frames: Keyframe[], duration: number) => el.animate(frames, { duration: still ? 1 : duration, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'forwards' }).finished
+  // verschijnen
+  await Promise.all(cards.map((c, i) => move(c, [{ transform: pos(1, 0, 0), opacity: 0 }, { transform: pos(i, 0, (i - 1) * 8), opacity: 1 }], 350)))
+  // husselen: D en T wisselen met een boogje, A huppelt mee
+  await Promise.all([
+    move(cards[0], [{ transform: pos(0, 0, -8) }, { transform: pos(1, 70, 200) }, { transform: pos(2, 0, 368) }], 700),
+    move(cards[1], [{ transform: pos(1, 0, 0) }, { transform: pos(1, 30, -12) }, { transform: pos(1, 0, 0) }], 700),
+    move(cards[2], [{ transform: pos(2, 0, 8) }, { transform: pos(1, -50, -200) }, { transform: pos(0, 0, -368) }], 700),
+  ])
+  await new Promise((r) => setTimeout(r, 900)) // even TAD laten zien
+  // en weer terug
+  await Promise.all([
+    move(cards[0], [{ transform: pos(2, 0, 368) }, { transform: pos(0, 0, -8) }], 500),
+    move(cards[2], [{ transform: pos(0, 0, -368) }, { transform: pos(2, 0, 8) }], 500),
+  ])
+  await new Promise((r) => setTimeout(r, 300))
+  await stage.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 250, fill: 'forwards' }).finished
+  stage.remove()
+  shuffling = false
 }
 
 // ---------- start ----------
